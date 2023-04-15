@@ -1,7 +1,6 @@
 #ifndef LISTENER_H
 #define LISTENER_H
 
-#include <stdlib.h>
 typedef struct str_buffer {
     unsigned size;
     void* data;

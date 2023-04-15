@@ -18,7 +18,11 @@ Sender sender;
 void signalHandler(int handler) {
     if (handler == SIGINT){
         if (listenerPID == 0) closeListener(listener);
-        else closeSender(sender);
+        else {
+            kill(listenerPID, SIGINT);
+            wait();
+            closeSender(sender);
+        }
         exit(EXIT_SUCCESS);
     }
 }
@@ -92,6 +96,8 @@ int main () {
     // Fork and PIDs
     senderPID = getpid();
     listenerPID = fork();
+
+    if (listenerPID < 0) exit(EXIT_FAILURE);
 
     // Signal interruption handler
     signal(SIGINT, signalHandler);
