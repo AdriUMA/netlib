@@ -3,9 +3,9 @@
 
 #define ADDRESS_SIZE 15
 
-typedef struct str_AddressList* AddressList;
+typedef struct str_addressList* AddressList;
 
-struct str_AddressList {
+struct str_addressList {
     char address[ADDRESS_SIZE];
     AddressList next;
 };
