@@ -18,7 +18,7 @@ typedef struct str_listener {
 
 Listener openListener(unsigned port, unsigned bufferSize);
 
-int closeListener(Listener listener);
+void closeListener(Listener listener);
 
 int  waitFrame(Listener listener);
 

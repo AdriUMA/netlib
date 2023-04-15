@@ -39,15 +39,22 @@ Listener openListener(unsigned port, unsigned bufferSize){
     return listener;
 }
 
-int closeListener(Listener listener){
+void closeListener(Listener listener){
     // Close socket by id
     close(listener->socketFD);
+
+    // Free memory
+    free(listener->buffer.data);
+    free(listener);
 }
 
 int waitFrame(Listener listener){
     // Waiting for new client data
     listener->buffer.dataSize = recv(listener->socketFD, listener->buffer.data, listener->buffer.size, MSG_WAITALL);
     
+    // Overflow
+    if (listener->buffer.dataSize > listener->buffer.size) return -1;
+
     // Return -1 if error happends
     return listener->buffer.dataSize < 0 ? -1 : 0;
 }
