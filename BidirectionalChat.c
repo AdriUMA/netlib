@@ -23,7 +23,7 @@ void signalHandler(int handler) {
     }
 }
 
-void listenerHandler(char* username) {
+void listenerHandler() {
     listener = openListener(PORT, BUFFERSIZE);
     if (listener == NULL) {
         kill(senderPID, SIGINT);
@@ -33,7 +33,8 @@ void listenerHandler(char* username) {
     while(1)
     {
         waitFrame(listener);
-        printf("%s: %s\n", username, (const char*)listener->buffer.data);
+        printf("%s\n", (const char*)listener->buffer.data);
+        fflush(stdout);
     }    
     
     closeListener(listener);
@@ -41,18 +42,26 @@ void listenerHandler(char* username) {
 
 void senderHandler(char* address, char* username){
     sender = openSender(address, PORT, BUFFERSIZE);
-
+    char header[USERBUFFER+2];
+    
     char* message = malloc(sender->bufferSize);
     if (message == NULL) {
         kill(listenerPID, SIGINT);
         exit(EXIT_FAILURE);
     }
 
-    strcpy(username, ": ");
-    strcpy(username, message);
+    header[0] = '\0';
+    message[0] = '\0';
+
+    strcat(header, username);
+    strcat(header, ": ");
+    strcat(message, header);
 
     while (1) {
-        if (scanf("%s", message)) message[BUFFERSIZE-1] = '\0';
+        scanf("\n%[^\n]", (message+strlen(header)));
+        
+        message[BUFFERSIZE-1] = '\0';
+
         sendFrame(sender, message, strlen(message)+1);
     }
 
@@ -71,15 +80,25 @@ int main () {
     // Username
     printf("\nUsername: ");
     scanf("%s", username);
-    username[USERBUFFER-1] = '\0';
 
+    if (strlen(username) < USERBUFFER){
+        for (int i = strlen(username); i < USERBUFFER; i++) {
+            username[i] = ' ';
+        }
+    }
+    
+    username[USERBUFFER-1] = '\0';
+    
     // Fork and PIDs
     senderPID = getpid();
     listenerPID = fork();
 
+    // Signal interruption handler
+    signal(SIGINT, signalHandler);
+
     // Proccess behaviour divisor
     if (listenerPID == 0){
-        listenerHandler(username);
+        listenerHandler();
     }else{
         senderHandler(address, username);
     }
