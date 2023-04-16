@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 #define PORT 55155
 #define BUFFERSIZE 1024
@@ -21,7 +22,7 @@ void signalHandler(int handler) {
     }
 }
 
-void noticeHosts(char* frameOwner, Buffer* buffer){
+void noticeHosts(char* frameOwner, const Buffer* buffer){
     Sender sender;
     AddressList current = addressList;
 
@@ -39,19 +40,29 @@ void noticeHosts(char* frameOwner, Buffer* buffer){
 
 
 void listenerHandler() {
-    char from[128];
+    char from[20];
+    char debug[BUFFERSIZE+100];
+
     printf("###DEBUG -> Entrando al listener\n");
 
     while(1)
     {
         strcpy(from, waitFrame(listener));
 
-        insertAddress(&addressList, from);
+        // Send to other hosts new info
+        noticeHosts(from, (const Buffer*)&listener->buffer);
 
-        printf("FROM: %s | DATA: %s\n", from, (char*)listener->buffer.data);
+        // Prepare debug log
+        strcpy(debug, "FROM: ");
+        strcat(debug, from);
+        strcat(debug, " | DATA: ");
+        strcat(debug, (const char*)listener->buffer.data);
+
+        // Show debug
+        printf("%s\n", debug);
         fflush(stdout);
 
-        noticeHosts(from, &listener->buffer);
+        insertAddress(&addressList, from);
     }    
     
     closeListener(listener);
