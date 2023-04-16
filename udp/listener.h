@@ -1,6 +1,9 @@
 #ifndef LISTENER_H
 #define LISTENER_H
 
+#include <netinet/in.h>
+#include <sys/socket.h>
+
 typedef struct str_buffer {
     unsigned size;
     void* data;
@@ -14,11 +17,10 @@ typedef struct str_listener {
     Buffer buffer;
 }* Listener;
 
-
 Listener openListener(unsigned port, unsigned bufferSize);
 
 void closeListener(Listener listener);
 
-int  waitFrame(Listener listener);
+char* waitFrame(Listener listener);
 
 #endif

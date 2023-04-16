@@ -1,5 +1,6 @@
 #include "udp/listener.h"
 #include "udp/sender.h"
+#include <arpa/inet.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +21,6 @@ void signalHandler(int handler) {
         if (listenerPID == 0) closeListener(listener);
         else {
             kill(listenerPID, SIGINT);
-            wait();
             closeSender(sender);
         }
         exit(EXIT_SUCCESS);
@@ -36,8 +36,7 @@ void listenerHandler() {
 
     while(1)
     {
-        waitFrame(listener);
-        printf("%s\n", (const char*)listener->buffer.data);
+        printf("%s -> %s\n", waitFrame(listener), (const char*)listener->buffer.data);
         fflush(stdout);
     }    
     

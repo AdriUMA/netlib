@@ -48,13 +48,12 @@ void closeListener(Listener listener){
     free(listener);
 }
 
-int waitFrame(Listener listener){
-    // Waiting for new client data
-    listener->buffer.dataSize = recv(listener->socketFD, listener->buffer.data, listener->buffer.size, MSG_WAITALL);
-    
-    // Overflow
-    if (listener->buffer.dataSize > listener->buffer.size) return -1;
+char* waitFrame(Listener listener){
+    struct sockaddr_in client;
+    socklen_t len;
 
-    // Return -1 if error happends
-    return listener->buffer.dataSize < 0 ? -1 : 0;
+    // Waiting for new client data
+    listener->buffer.dataSize = recvfrom(listener->socketFD, listener->buffer.data, listener->buffer.size, MSG_WAITALL, (struct sockaddr *restrict) &client, (socklen_t *restrict)&len);
+    
+    return inet_ntoa(client.sin_addr);
 }
