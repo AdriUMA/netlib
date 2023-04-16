@@ -9,10 +9,13 @@
 #include <unistd.h>
 #include<sys/wait.h>
 
-// Ports and buffer
+// Ports
 #define SERVER_PORT 55154
 #define LISTENER_PORT 55155
+// Buffer and connection
 #define SERVER_BUFFER 1024
+#define NOTICE_CONNECT "::::::::::CONNECT::::::::::\0"
+#define NOTICE_DISCONNECT "::::::::::DISCONNECT::::::::::\0"
 
 // Dad will be the sender
 pid_t senderPid;
@@ -25,13 +28,18 @@ Listener listener;
 void signalHandler(int signal){
     if (signal == SIGINT){
         if (childPid == 0) {
-            closeListener(listener);
+            if (listener != NULL) closeListener(listener);
             exit(EXIT_SUCCESS);
         }else{
             kill(childPid, SIGINT);
             wait(NULL);
 
-            closeSender(sender);
+            if (sender != NULL){
+                // If sender is available, send to server our disconnection
+                sendFrame(sender, NOTICE_DISCONNECT, strlen(NOTICE_DISCONNECT)+1);
+                closeSender(sender);
+            }
+
             exit(EXIT_SUCCESS);
         }
     }
@@ -83,6 +91,8 @@ void listenerManager(){
 }
 
 void senderManager() {
+    
+
     int infoLen = 20;
     char serverAddress[infoLen];
     char name[infoLen];
@@ -115,6 +125,9 @@ void senderManager() {
         perror("\nError opening sender\n");
         kill(senderPid, SIGINT);
     }
+
+    // Notice to the server our connection
+    sendFrame(sender, NOTICE_CONNECT, strlen(NOTICE_CONNECT)+1);
 
     // Read and send loop
     while (1) {
