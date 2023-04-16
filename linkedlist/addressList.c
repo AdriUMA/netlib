@@ -1,6 +1,7 @@
 #include "addressList.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 void createList(AddressList *addressList){
     *addressList = NULL;
@@ -32,7 +33,7 @@ void insertAddress(AddressList* addressList, char* address){
 
         while (current != NULL)
         {
-            if(strcmp(current->address, address)){
+            if(strcmp(current->address, address) == 0){
                 free(newAddress);
                 return;
             }
@@ -46,23 +47,27 @@ void insertAddress(AddressList* addressList, char* address){
 }
 
 void removeAddress(AddressList* addressList, char* address){
-    if(addressList == NULL) return;
+    if(*addressList == NULL) return;
 
-    AddressList previous = NULL;
     AddressList current = *addressList;
+    AddressList previous = current;
 
-    while(current != NULL && strcmp(current->address, address) == 1){
-        previous = current;
+    if(strcmp(current->address, address) == 0){
+        *addressList = current->next;
+        free(current);
+        return;
+    }else{
         current = current->next;
     }
 
+    while(current != NULL && strcmp(current->address, address) != 0){
+        previous = current;
+        current = current->next;
+    }
+    
     if(current != NULL){
 
-        if(*addressList == current){
-            *addressList = current->next;
-        }else{
-            previous = current->next;
-        }
+        previous->next = current->next;
         free(current);
 
     }
