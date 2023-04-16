@@ -26,10 +26,12 @@ void noticeHosts(char* frameOwner, Buffer* buffer){
     AddressList current = addressList;
 
     while (current != NULL) {
-        if (!strcmp(frameOwner, current->address)){
+        if (strcmp(frameOwner, current->address) != 0){
             sender = openSender(current->address, PORT, BUFFERSIZE);
-            sendFrame(sender, buffer->data, buffer->dataSize);
-            closeSender(sender);
+            if (sender != NULL){
+                sendFrame(sender, buffer->data, buffer->dataSize);
+                closeSender(sender);
+            }
         }
         current = current->next;
     }
@@ -37,18 +39,19 @@ void noticeHosts(char* frameOwner, Buffer* buffer){
 
 
 void listenerHandler() {
-    char* from;
+    char from[128];
+    printf("###DEBUG -> Entrando al listener\n");
 
     while(1)
     {
-        from = waitFrame(listener);
+        strcpy(from, waitFrame(listener));
+
         insertAddress(&addressList, from);
 
-        printf("FROM: %s | DATA: %s\n", from, (const char*)listener->buffer.data);
+        printf("FROM: %s | DATA: %s\n", from, (char*)listener->buffer.data);
+        fflush(stdout);
 
         noticeHosts(from, &listener->buffer);
-
-        fflush(stdout);
     }    
     
     closeListener(listener);

@@ -34,7 +34,7 @@ Listener openListener(unsigned port, unsigned bufferSize){
 
     // Socket opening
     if (bind(listener->socketFD, (const struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) return NULL;
-
+    
     // Returning the listener ready
     return listener;
 }

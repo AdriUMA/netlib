@@ -36,7 +36,8 @@ void listenerHandler() {
 
     while(1)
     {
-        printf("%s -> %s\n", waitFrame(listener), (const char*)listener->buffer.data);
+        waitFrame(listener);
+        printf("%s\n", (const char*)listener->buffer.data);
         fflush(stdout);
     }    
     
