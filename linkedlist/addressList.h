@@ -12,7 +12,7 @@ struct str_addressList {
 
 void createList(AddressList* addressList);
 
-void deleteList(AddressList* address);
+void deleteList(AddressList* addressList);
 
 void insertAddress(AddressList* addressList, char* address);
 

@@ -17,10 +17,22 @@ typedef struct str_listener {
     Buffer buffer;
 }* Listener;
 
+/** @brief Allocate in memory and open listener socket
+ *  @param port
+ *  @param bufferSize
+ *  @return Pointer to struct in memory or NULL if socket or memory are busy 
+ */
 Listener openListener(unsigned port, unsigned bufferSize);
 
+/** @brief Close socket and free memory
+ *  @param listener
+ */
 void closeListener(Listener listener);
 
+/** @brief Sleep waiting for a frame
+ *  @param listener
+ *  @return Source address
+ */
 char* waitFrame(Listener listener);
 
 #endif

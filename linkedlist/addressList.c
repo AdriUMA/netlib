@@ -7,19 +7,21 @@ void createList(AddressList *addressList){
     *addressList = NULL;
 }
 
-void deleteList(AddressList *address){
+void deleteList(AddressList *addressList){
     AddressList previous = NULL;
-    AddressList current = *address;
+    AddressList current = *addressList;
 
     while (current != NULL) {
         previous = current;
         current = current->next;
         free(previous);
     }
+
+    *addressList = NULL;
 }
 
 void insertAddress(AddressList* addressList, char* address){
-    AddressList newAddress = malloc(sizeof(AddressList));
+    AddressList newAddress = malloc(sizeof(struct str_addressList));
     if(newAddress == NULL) return;
 
     newAddress->next = NULL;
