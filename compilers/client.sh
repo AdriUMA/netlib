@@ -2,5 +2,5 @@ if [ ! -d "bin" ]; then
     mkdir bin
 fi
 
-gcc client.c udp/listener.c udp/sender.c -o ./bin/client.out
+gcc -g client.c udp/sender.c udp/listener.c -o ./bin/client.out
 ./bin/client.out

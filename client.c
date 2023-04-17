@@ -1,5 +1,6 @@
-#include "udp/listener.h"
+#include "ports.h"
 #include "udp/sender.h"
+#include "udp/listener.h"
 
 #include <signal.h>
 #include <stdio.h>
@@ -7,12 +8,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include<sys/wait.h>
-
-// Ports and buffer
-#define SERVER_PORT 55154
-#define LISTENER_PORT 55155
-#define SERVER_BUFFER 1024
+#include <sys/wait.h>
 
 // Dad will be the sender
 pid_t senderPid;
@@ -25,13 +21,18 @@ Listener listener;
 void signalHandler(int signal){
     if (signal == SIGINT){
         if (childPid == 0) {
-            closeListener(listener);
+            if (listener != NULL) closeListener(listener);
             exit(EXIT_SUCCESS);
         }else{
             kill(childPid, SIGINT);
             wait(NULL);
 
-            closeSender(sender);
+            if (sender != NULL){
+                // If sender is available, send to server our disconnection
+                sendFrame(sender, NOTICE_DISCONNECT, strlen(NOTICE_DISCONNECT)+1);
+                closeSender(sender);
+            }
+
             exit(EXIT_SUCCESS);
         }
     }
@@ -43,6 +44,8 @@ void senderManager();
 int main() {
     // Signal manager
     signal(SIGINT, signalHandler);
+
+    VERSION;
 
     // Proccess division
     senderPid = getpid();
@@ -63,11 +66,11 @@ int main() {
 
 void listenerManager(){
     // Open listener
-    listener = openListener(LISTENER_PORT, SERVER_BUFFER);
+    listener = openListener(CLIENT_PORT, SERVER_BUFFER);
     
     // Error opening listener socket
     if (listener == NULL){
-        perror("\nError opening listener\n");
+        perror("\nError opening listener");
         kill(senderPid, SIGINT);
     }
 
@@ -78,7 +81,7 @@ void listenerManager(){
     }
 
     // Interruption exception
-    perror("\nUnexpected error: Listener stop working\n");
+    perror("\nUnexpected error: Listener stop working");
     closeListener(listener);
 }
 
@@ -115,6 +118,9 @@ void senderManager() {
         perror("\nError opening sender\n");
         kill(senderPid, SIGINT);
     }
+
+    // Notice to the server our connection
+    sendFrame(sender, NOTICE_CONNECT, strlen(NOTICE_CONNECT)+1);
 
     // Read and send loop
     while (1) {

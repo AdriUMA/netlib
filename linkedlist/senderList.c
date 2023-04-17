@@ -27,10 +27,10 @@ void deleteList(SenderList* senderList){
     *senderList = NULL;
 }
 
-void insertSender(SenderList* senderList, char* address, unsigned port, unsigned bufferSize){
+Sender insertSender(SenderList* senderList, char* address, unsigned port, unsigned bufferSize){
     // Sender to add
-    SenderList newSender =  malloc(sizeof(struct str_senderList));
-    if(newSender == NULL) return;
+    SenderList newSender = malloc(sizeof(struct str_senderList));
+    if(newSender == NULL) return NULL;
 
     // New sender inicialization
     newSender->next = NULL;
@@ -49,7 +49,7 @@ void insertSender(SenderList* senderList, char* address, unsigned port, unsigned
 
             // Free memory
             free(newSender);
-            return;
+            return NULL;
         }
 
     }else{
@@ -63,7 +63,7 @@ void insertSender(SenderList* senderList, char* address, unsigned port, unsigned
             if(strcmp(current->sender->address, address) == 0){
                 // Free memory                
                 free(newSender);
-                return;
+                return NULL;
             }
 
             previous = current;
@@ -82,10 +82,11 @@ void insertSender(SenderList* senderList, char* address, unsigned port, unsigned
 
             // Free memory
             free(newSender);
-            return;
+            return NULL;
         }
-
     }
+
+    return newSender->sender;
 }
 
 void removeSender(SenderList* senderList, char* address){

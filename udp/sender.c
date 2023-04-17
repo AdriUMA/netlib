@@ -1,4 +1,5 @@
 #include "sender.h"
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -13,7 +14,10 @@ Sender openSender(char* address, unsigned port, unsigned bufferSize){
     if ((sender = malloc(sizeof(struct str_sender))) == NULL) return NULL;
 
     // Init IPv4-UDP socket
-    if ((sender->socketFD = socket(AF_INET, SOCK_DGRAM, 0)) < 0) return NULL;
+    if ((sender->socketFD = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+        free(sender);
+        return NULL;
+    }
 
     // Init sender
     if ((sender->address = malloc(sizeof(char)*(strlen(address)+1))) == NULL) return NULL;
@@ -25,6 +29,8 @@ Sender openSender(char* address, unsigned port, unsigned bufferSize){
 }
 
 void closeSender(Sender sender){
+    if (sender == NULL) return;
+    
     // Close socket
     close(sender->socketFD);
 
