@@ -82,10 +82,12 @@ void run(){
         else if (strcmp((const char*)listener->buffer.data, NOTICE_CONNECT) == 0){
             newClient = insertSender(&clients, clientAddress, CLIENT_PORT, SERVER_BUFFER);
             sendFrame(newClient, WELCOME_MESSAGE, strlen(WELCOME_MESSAGE)+1);
+            printf("\n(+) Client Conected: %s\n", clientAddress);
         }
         // Client log out
         else if (strcmp((const char*)listener->buffer.data, NOTICE_DISCONNECT) == 0){
             removeSender(&clients, clientAddress);
+            printf("\n(-) Client Disconected: %s\n", clientAddress);
         }
         // Any data
         else {
@@ -99,6 +101,7 @@ void run(){
                 printf("\nREFUSED FROM: %s\nREFUSED DATA: %s\n", clientAddress, (const char*)listener->buffer.data);
             }
         }
+        fflush(stdout);
     }
 
     
