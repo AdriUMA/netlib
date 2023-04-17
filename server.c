@@ -9,14 +9,29 @@
 #include <string.h>
 
 #define WELCOME_MESSAGE "\n### -------------- SERVER ------------- ###\n### Connection established successfully ###\n### -------------- SERVER ------------- ###\n\0"
-                                           
+#define TERMINATED_MESSAGE "\n### -------------- SERVER -------------- ###\n### Closing server, connection teminated ###\n### -------------- SERVER -------------- ###\n\0"
+                                                                           
 Listener listener;
 SenderList clients;
 
 void signalHandler(int signal){
     if(signal == SIGINT) {
-        if (listener != NULL) closeListener(listener);
-        deleteList(&clients);
+        if (listener == NULL || clients == NULL){
+            closeListener(listener);
+            deleteList(&clients);
+        }else {
+            // If signal was triggered by user
+            SenderList aux = clients;
+
+            while (aux != NULL) {
+                sendFrame(aux->sender, TERMINATED_MESSAGE, strlen(TERMINATED_MESSAGE)+1);
+                aux = aux->next;
+            }
+
+            closeListener(listener);
+            deleteList(&clients);
+        }
+
         exit(EXIT_SUCCESS);
     }
 }

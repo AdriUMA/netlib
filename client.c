@@ -120,6 +120,7 @@ void senderManager() {
     }
 
     // Notice to the server our connection
+    printf("Waiting server response\n");
     sendFrame(sender, NOTICE_CONNECT, strlen(NOTICE_CONNECT)+1);
 
     // Read and send loop
