@@ -25,8 +25,9 @@ void deleteList(SenderList* senderList);
  *  @param address Listener (destination) address
  *  @param port Listener (destination) port
  *  @param bufferSize Listener (destination) buffer
+ *  @return Sender or NULL if socket opening fails
  */
-void insertSender(SenderList* senderList, char* address, unsigned port, unsigned bufferSize);
+Sender insertSender(SenderList* senderList, char* address, unsigned port, unsigned bufferSize);
 
 /** @brief Remove one sender by address.
  *  @param senderList

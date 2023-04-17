@@ -16,13 +16,19 @@ Listener openListener(unsigned port, unsigned bufferSize){
     if (listener == NULL) return NULL;
 
     // Prepare a socket using IPv4 and UDP
-    if ((listener->socketFD = socket(AF_INET, SOCK_DGRAM, 0)) < 0) return NULL;
+    if ((listener->socketFD = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        free(listener);
+        return NULL;
+    }
 
     // Buffer
     listener->buffer.size = bufferSize;
     listener->buffer.dataSize = 0;
     listener->buffer.data = malloc(sizeof(bufferSize));
-    if (listener->buffer.data == NULL) return NULL;
+    if (listener->buffer.data == NULL)  {
+        free(listener);
+        return NULL;
+    }
 
     // Port
     listener->port = port;
@@ -33,13 +39,19 @@ Listener openListener(unsigned port, unsigned bufferSize){
     serverAddress.sin_addr.s_addr = INADDR_ANY;
 
     // Socket opening
-    if (bind(listener->socketFD, (const struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) return NULL;
+    if (bind(listener->socketFD, (const struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) {
+        free(listener->buffer.data);
+        free(listener);
+        return NULL;
+    }
     
     // Returning the listener ready
     return listener;
 }
 
 void closeListener(Listener listener){
+    if (listener == NULL) return;
+
     // Close socket by id
     close(listener->socketFD);
 

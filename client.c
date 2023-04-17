@@ -1,5 +1,6 @@
-#include "udp/listener.h"
+#include "ports.h"
 #include "udp/sender.h"
+#include "udp/listener.h"
 
 #include <signal.h>
 #include <stdio.h>
@@ -7,15 +8,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include<sys/wait.h>
-
-// Ports
-#define SERVER_PORT 55154
-#define LISTENER_PORT 55155
-// Buffer and connection
-#define SERVER_BUFFER 1024
-#define NOTICE_CONNECT "::::::::::CONNECT::::::::::\0"
-#define NOTICE_DISCONNECT "::::::::::DISCONNECT::::::::::\0"
+#include <sys/wait.h>
 
 // Dad will be the sender
 pid_t senderPid;
@@ -52,6 +45,8 @@ int main() {
     // Signal manager
     signal(SIGINT, signalHandler);
 
+    VERSION;
+
     // Proccess division
     senderPid = getpid();
     childPid = fork();
@@ -71,11 +66,11 @@ int main() {
 
 void listenerManager(){
     // Open listener
-    listener = openListener(LISTENER_PORT, SERVER_BUFFER);
+    listener = openListener(CLIENT_PORT, SERVER_BUFFER);
     
     // Error opening listener socket
     if (listener == NULL){
-        perror("\nError opening listener\n");
+        perror("\nError opening listener");
         kill(senderPid, SIGINT);
     }
 
@@ -86,13 +81,11 @@ void listenerManager(){
     }
 
     // Interruption exception
-    perror("\nUnexpected error: Listener stop working\n");
+    perror("\nUnexpected error: Listener stop working");
     closeListener(listener);
 }
 
 void senderManager() {
-    
-
     int infoLen = 20;
     char serverAddress[infoLen];
     char name[infoLen];
