@@ -1,13 +1,13 @@
-#include "addressList.h"
+#include "addresslist.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-void createList(AddressList *addressList){
+void createAddressList(AddressList *addressList){
     *addressList = NULL;
 }
 
-void deleteList(AddressList *addressList){
+void deleteAddressList(AddressList *addressList){
     AddressList previous = NULL;
     AddressList current = *addressList;
 

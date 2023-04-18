@@ -1,6 +1,4 @@
 #include "ports.h"
-#include "udp/sender.h"
-#include "udp/listener.h"
 
 #include <signal.h>
 #include <stdio.h>
@@ -12,16 +10,16 @@
 
 // Dad will be the sender
 pid_t senderPid;
-Sender sender;
+UDPSender sender;
 
 // Child will be the listener
 pid_t childPid;
-Listener listener;
+UDPListener listener;
 
 void signalHandler(int signal){
     if (signal == SIGINT){
         if (childPid == 0) {
-            if (listener != NULL) closeListener(listener);
+            if (listener != NULL) closeUDPListener(listener);
             exit(EXIT_SUCCESS);
         }else{
             kill(childPid, SIGINT);
@@ -29,8 +27,8 @@ void signalHandler(int signal){
 
             if (sender != NULL){
                 // If sender is available, send to server our disconnection
-                sendFrame(sender, NOTICE_DISCONNECT, strlen(NOTICE_DISCONNECT)+1);
-                closeSender(sender);
+                sendUDP(sender, NOTICE_DISCONNECT, strlen(NOTICE_DISCONNECT)+1);
+                closeUDPSender(sender);
             }
 
             exit(EXIT_SUCCESS);
@@ -66,7 +64,7 @@ int main() {
 
 void listenerManager(){
     // Open listener
-    listener = openListener(CLIENT_PORT, SERVER_BUFFER);
+    listener = openUDPListener(CLIENT_PORT, SERVER_BUFFER);
     
     // Error opening listener socket
     if (listener == NULL){
@@ -76,13 +74,13 @@ void listenerManager(){
 
     // Listening
     while (1) {
-        waitFrame(listener);
+        listenUDP(listener);
         printf("\n> %s\n", (const char*)listener->buffer.data);
     }
 
     // Interruption exception
     perror("\nUnexpected error: Listener stop working");
-    closeListener(listener);
+    closeUDPListener(listener);
 }
 
 void senderManager() {
@@ -111,7 +109,7 @@ void senderManager() {
     strcat(buffer, ": ");
 
     // Open sender
-    sender = openSender(serverAddress, SERVER_PORT, SERVER_BUFFER);
+    sender = openUDPSender(serverAddress, SERVER_PORT, SERVER_BUFFER);
 
     // Error opening sender socket
     if (sender == NULL){
@@ -121,15 +119,15 @@ void senderManager() {
 
     // Notice to the server our connection
     printf("Waiting server response\n");
-    sendFrame(sender, NOTICE_CONNECT, strlen(NOTICE_CONNECT)+1);
+    sendUDP(sender, NOTICE_CONNECT, strlen(NOTICE_CONNECT)+1);
 
     // Read and send loop
     while (1) {
         scanf("\n%[^\n]", &buffer[bufferInitialPosition]);
-        sendFrame(sender, (void*)buffer, strlen(buffer)+1);
+        sendUDP(sender, (void*)buffer, strlen(buffer)+1);
     }
 
     // Interruption exception
     perror("\nUnexpected error: Sender stop working\n");
-    closeSender(sender);
+    closeUDPSender(sender);
 }

@@ -8,11 +8,11 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-Listener openListener(unsigned port, unsigned bufferSize){
+UDPListener openUDPListener(unsigned port, unsigned bufferSize){
     struct sockaddr_in serverAddress;
 
     // Allocate Memory for the listener struct.
-    Listener listener = malloc(sizeof(struct str_listener));
+    UDPListener listener = malloc(sizeof(struct str_udplistener));
     if (listener == NULL) return NULL;
 
     // Prepare a socket using IPv4 and UDP
@@ -49,7 +49,7 @@ Listener openListener(unsigned port, unsigned bufferSize){
     return listener;
 }
 
-void closeListener(Listener listener){
+void closeUDPListener(UDPListener listener){
     if (listener == NULL) return;
 
     // Close socket by id
@@ -60,7 +60,7 @@ void closeListener(Listener listener){
     free(listener);
 }
 
-char* waitFrame(Listener listener){
+char* listenUDP(UDPListener listener){
     struct sockaddr_in client;
     socklen_t len;
 

@@ -1,16 +1,16 @@
-#include "senderList.h"
+#include "senderlist.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-void createList(SenderList* senderList){
+void createUDPSenderList(UDPSenderList* senderList){
     *senderList = NULL;
 }
 
-void deleteList(SenderList* senderList){
-    SenderList previous = NULL;
-    SenderList current = *senderList;
+void deleteUDPSenderList(UDPSenderList* senderList){
+    UDPSenderList previous = NULL;
+    UDPSenderList current = *senderList;
 
     while (current != NULL) {
         // Iterate to the next node
@@ -18,7 +18,7 @@ void deleteList(SenderList* senderList){
         current = current->next;
 
         // Close Socket and free Sender memory
-        closeSender(previous->sender);
+        closeUDPSender(previous->sender);
 
         // Free list memory
         free(previous);
@@ -27,9 +27,9 @@ void deleteList(SenderList* senderList){
     *senderList = NULL;
 }
 
-Sender insertSender(SenderList* senderList, char* address, unsigned port, unsigned bufferSize){
+UDPSender insertUDPSender(UDPSenderList* senderList, char* address, unsigned port, unsigned bufferSize){
     // Sender to add
-    SenderList newSender = malloc(sizeof(struct str_senderList));
+    UDPSenderList newSender = malloc(sizeof(struct str_udpsenderlist));
     if(newSender == NULL) return NULL;
 
     // New sender inicialization
@@ -40,7 +40,7 @@ Sender insertSender(SenderList* senderList, char* address, unsigned port, unsign
         *senderList = newSender;
 
         // Open socket
-        newSender->sender = openSender(address, port, bufferSize);
+        newSender->sender = openUDPSender(address, port, bufferSize);
 
         // If fails
         if(newSender->sender == NULL){
@@ -53,8 +53,8 @@ Sender insertSender(SenderList* senderList, char* address, unsigned port, unsign
         }
 
     }else{
-        SenderList previous = NULL;
-        SenderList current = *senderList;
+        UDPSenderList previous = NULL;
+        UDPSenderList current = *senderList;
 
         // Iterates all the list
         while (current != NULL)
@@ -73,7 +73,7 @@ Sender insertSender(SenderList* senderList, char* address, unsigned port, unsign
         previous->next = newSender;
 
         // Open socket
-        newSender->sender = openSender(address, port, bufferSize);
+        newSender->sender = openUDPSender(address, port, bufferSize);
 
         // If fails
         if(newSender->sender == NULL){
@@ -89,11 +89,11 @@ Sender insertSender(SenderList* senderList, char* address, unsigned port, unsign
     return newSender->sender;
 }
 
-void removeSender(SenderList* senderList, char* address){
+void removeUDPSender(UDPSenderList* senderList, char* address){
     if(*senderList == NULL) return;
 
-    SenderList current = *senderList;
-    SenderList previous = current;
+    UDPSenderList current = *senderList;
+    UDPSenderList previous = current;
 
     // If first element is the target
     if(strcmp(current->sender->address, address) == 0){
@@ -101,7 +101,7 @@ void removeSender(SenderList* senderList, char* address){
         *senderList = current->next;
 
         // Then, free memory
-        closeSender(current->sender);
+        closeUDPSender(current->sender);
         free(current);
         return;
     }else{
@@ -120,7 +120,7 @@ void removeSender(SenderList* senderList, char* address){
         previous->next = current->next;
 
         // Free memory
-        closeSender(current->sender);
+        closeUDPSender(current->sender);
         free(current);
     }
 }

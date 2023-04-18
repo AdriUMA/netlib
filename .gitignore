@@ -1,4 +1,5 @@
 *.out
 *.exe
+*.bin
 .vscode
 old

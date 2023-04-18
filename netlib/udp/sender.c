@@ -7,11 +7,11 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-Sender openSender(char* address, unsigned port, unsigned bufferSize){
-    Sender sender;
+UDPSender openUDPSender(char* address, unsigned port, unsigned bufferSize){
+    UDPSender sender;
 
     // Allocate memory for the sender
-    if ((sender = malloc(sizeof(struct str_sender))) == NULL) return NULL;
+    if ((sender = malloc(sizeof(struct str_udpsender))) == NULL) return NULL;
 
     // Init IPv4-UDP socket
     if ((sender->socketFD = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
@@ -28,7 +28,7 @@ Sender openSender(char* address, unsigned port, unsigned bufferSize){
     return sender;
 }
 
-void closeSender(Sender sender){
+void closeUDPSender(UDPSender sender){
     if (sender == NULL) return;
     
     // Close socket
@@ -39,7 +39,7 @@ void closeSender(Sender sender){
     free(sender);
 }
 
-int sendFrame(Sender sender, void *data, unsigned int dataLength){
+int sendUDP(UDPSender sender, void *data, unsigned int dataLength){
     struct sockaddr_in server;
 
     // Server
