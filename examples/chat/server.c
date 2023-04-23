@@ -101,8 +101,10 @@ void run(){
         }
         // Client log out
         else if (strcmp((const char*)listener->buffer.data, NOTICE_DISCONNECT) == 0){
-            removeUDPSender(&clients, clientAddress);
-            printf("\n(-) Client Disconected: %s\n", clientAddress);
+            if(alredyConnected(clientAddress) == 0){
+                removeUDPSender(&clients, clientAddress);
+                printf("\n(-) Client Disconected: %s\n", clientAddress);
+            }
         }
         // Any data
         else {
