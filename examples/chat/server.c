@@ -120,6 +120,5 @@ void run(){
         }
         fflush(stdout);
     }
-
-    
 }
+
