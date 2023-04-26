@@ -5,9 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define WELCOME_MESSAGE "\n### -------------- SERVER ------------- ###\n### Connection established successfully ###\n### -------------- SERVER ------------- ###\n\0"
-#define TERMINATED_MESSAGE "\n### -------------- SERVER -------------- ###\n### Closing server, connection teminated ###\n### -------------- SERVER -------------- ###\n\0"
-                                                                           
 UDPListener listener;
 UDPSenderList clients;
 

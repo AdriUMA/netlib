@@ -16,5 +16,8 @@
 #define SERVER_BUFFER 1024
 #define NOTICE_CONNECT "::::::::::CONNECT::::::::::\0"
 #define NOTICE_DISCONNECT "::::::::::DISCONNECT::::::::::\0"
+#define CONNECTION_SUCESS "::::::::::DISCONNECT::::::::::\0"
+#define WELCOME_MESSAGE "\n### -------------- SERVER ------------- ###\n### Connection established successfully ###\n### -------------- SERVER ------------- ###\n\0"
+#define TERMINATED_MESSAGE "\n### -------------- SERVER -------------- ###\n### Closing server, connection teminated ###\n### -------------- SERVER -------------- ###\n\0"
 
 #endif
