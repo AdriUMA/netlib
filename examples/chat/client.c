@@ -16,6 +16,8 @@ UDPSender sender;
 pid_t childPid;
 UDPListener listener;
 
+int connection = 0;
+
 void signalHandler(int signal){
     if (signal == SIGINT){
         if (childPid == 0) {
@@ -34,11 +36,13 @@ void signalHandler(int signal){
             exit(EXIT_SUCCESS);
         }
     }
+    else if(signal == SIGUSR1){
+        connection = 1;
+    }
 }
 
 void listenerManager();
 void senderManager();
-
 int main() {
     // Signal manager
     signal(SIGINT, signalHandler);
@@ -75,6 +79,14 @@ void listenerManager(){
     // Listening
     while (1) {
         listenUDP(listener);
+        if(connection == 0){
+            // If connection is not established, we are waiting for server notice
+            if (strcmp((const char*)listener->buffer.data, WELCOME_MESSAGE) == 0){
+                // If server notice us, we are connected
+                connection = 1;
+                kill(senderPid, SIGUSR1);
+            }
+        }
         printf("\n> %s\n", (const char*)listener->buffer.data);
     }
 
@@ -121,8 +133,21 @@ void senderManager() {
     printf("Waiting server response\n");
     sendUDP(sender, NOTICE_CONNECT, strlen(NOTICE_CONNECT)+1);
 
+    signal(SIGUSR1, signalHandler);
+
+    int sleepTime = 5;
+    while(connection == 0 && sleepTime != 0){
+        sendUDP(sender, NOTICE_CONNECT, strlen(NOTICE_CONNECT)+1);
+        sleepTime--;
+        sleep(1);
+    }
+    if(connection == 0){
+        perror("\nServer not responding\n");
+        kill(senderPid, SIGINT);
+    }
+
     // Read and send loop
-    while (1) {
+    while (connection) {
         scanf("\n%[^\n]", &buffer[bufferInitialPosition]);
         sendUDP(sender, (void*)buffer, strlen(buffer)+1);
     }
