@@ -131,7 +131,6 @@ void senderManager() {
 
     // Notice to the server our connection
     printf("Waiting server response\n");
-    sendUDP(sender, NOTICE_CONNECT, strlen(NOTICE_CONNECT)+1);
 
     signal(SIGUSR1, signalHandler);
 
