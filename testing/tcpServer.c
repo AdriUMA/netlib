@@ -36,7 +36,8 @@ int main() {
         perror("Error al aceptar la conexión");
         exit(1);
     }
-
+    printf("hola");
+    fflush(stdout);
     char buffer[256];
     int n = recv(newsockfd, buffer, sizeof(buffer), 0);
     if (n < 0) {
