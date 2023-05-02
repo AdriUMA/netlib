@@ -10,11 +10,14 @@ typedef struct str_buffer {
 } Buffer;
 #endif
 
+#include "../linkedlist/socketlist.h"
+
 /*listener struct*/
 typedef struct str_tcplistener {
     unsigned port;
     int socketFD;
     Buffer buffer;
+    SocketList socketList;
 }* TCPListener;
 
 /** @brief Allocate in memory and open listener socket

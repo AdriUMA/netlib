@@ -20,12 +20,13 @@ void deleteSocketList(SocketList *socketList){
     *socketList = NULL;
 }
 
-void insertSocket(SocketList* socketList, int socket){
+void insertSocket(SocketList* socketList, int socket, char* address){
     SocketList newSocket = malloc(sizeof(struct str_socketList));
     if(newSocket == NULL) return;
 
     newSocket->next = NULL;
     newSocket->socket = socket;
+    strcpy(newSocket->address, address);
 
     if(*socketList == NULL){
         *socketList = newSocket;
@@ -48,13 +49,13 @@ void insertSocket(SocketList* socketList, int socket){
     }
 }
 
-void removeSocket(SocketList* socketList, int socket){
+void removeSocket(SocketList* socketList, int socket, char* address){
     if(*socketList == NULL) return;
 
     SocketList current = *socketList;
     SocketList previous = current;
 
-    if(current->socket == socket){
+    if(current->socket == socket && strcmp(current->address, address) == 0){
         *socketList = current->next;
         free(current);
         return;
@@ -62,7 +63,7 @@ void removeSocket(SocketList* socketList, int socket){
         current = current->next;
     }
 
-    while(current != NULL && current->socket != socket){
+    while(current != NULL && current->socket != socket && strcmp(current->address, address) != 0){
         previous = current;
         current = current->next;
     }
@@ -71,4 +72,17 @@ void removeSocket(SocketList* socketList, int socket){
         previous->next = current->next;
         free(current);
     }
+}
+
+int getSocket(SocketList* socketList, char* address){
+    if(*socketList == NULL) return -1;
+
+    SocketList current = *socketList;
+
+    while(current != NULL){
+        if (strcmp(current->address, address) == 0) return current->socket;
+        current = current->next;
+    }
+    
+    return -1;
 }
