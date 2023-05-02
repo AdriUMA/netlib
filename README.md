@@ -4,6 +4,7 @@
 
 - Generic
   - Address linked list
+  - Socket linked list
 - UDP
   - Listener
   - Sender
