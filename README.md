@@ -14,4 +14,4 @@
 
 ## Examples
 
-- [Chat usign UDP](/examples/chat)
+- [Chat usign UDP](/examples/chat-udp)
