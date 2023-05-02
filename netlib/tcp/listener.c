@@ -9,12 +9,14 @@
 
 
 TCPListener openTCPListener(unsigned port, unsigned bufferSize){
+    int opt = 1;
+
     // Allocate Memory for the listener struct.
     TCPListener listener = malloc(sizeof(struct str_tcplistener));
     if (listener == NULL) return NULL;
 
     // Prepare a socket using IPv4 and TCP
-    if ((listener->socketFD = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    if ((listener->socketFD = socket(AF_INET, SOCK_STREAM, 0)) <= 0) {
         free(listener);
         return NULL;
     }
@@ -62,15 +64,15 @@ void closeTCPListener(TCPListener listener){
 }
 
 char* listenTCP(TCPListener listener){
-    int client_socket;
+    int client_socket = -1;
     struct sockaddr_in client_addr;
     socklen_t len = sizeof(client_addr);
 
-    // Waiting for accept connection
-    client_socket = accept(listener->socketFD, (struct sockaddr *) &client_addr, &len);
+    // Wait and accept connection
+    if(listen(listener->socketFD, 16) >= 0) client_socket = accept(listener->socketFD, (struct sockaddr *) &client_addr, &len);
 
-    // Waiting for new client data
-    if(client_socket >= 0) listener->buffer.dataSize = recv(client_socket, listener->buffer.data, listener->buffer.size, MSG_WAITALL);
+    // Read client data
+    if(client_socket >= 0) listener->buffer.dataSize = read(client_socket, listener->buffer.data, listener->buffer.size);
     
     return inet_ntoa(client_addr.sin_addr);
 }
