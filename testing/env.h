@@ -1,0 +1,7 @@
+#ifndef ENV_TESTING_MACROS
+#define ENV_TESTING_MACROS
+
+#define SERVER_PORT 47747
+#define SERVER_BUFFER 1024
+
+#endif
