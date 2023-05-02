@@ -1,12 +1,9 @@
 #include "listener.h"
 
-#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
-
 
 TCPListener openTCPListener(unsigned port, unsigned bufferSize){
     int opt = 1;
