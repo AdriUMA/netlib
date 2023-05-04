@@ -1,5 +1,5 @@
 #include "env.h"
-#include "../netlib/netlib.h"
+#include "../../netlib/netlib.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,11 +44,11 @@ int main(){
     printf("\nConnected\n");
     fflush(stdout);
 
-    char user[30] = "ATM";
+    char user[30] = "Client";
     char str[SERVER_BUFFER - (2 + strlen(user))];
     char data[SERVER_BUFFER];
 
-    while (1) {
+    do {
         scanf("\n%[^\n]", str);
 
         strcpy(data, user);
@@ -63,9 +63,12 @@ int main(){
         fflush(stdout);
 
         waitResponse(sender, buffer);
-        printf("\n[*] SERVER: %s\n", (char*)buffer->data);
+        if(buffer->dataSize > 0) printf("\n[*] SERVER: %s\n", (char*)buffer->data);
         fflush(stdout);
-    }
+    } while (buffer->dataSize > 0); 
+
+    printf("\n\nThe server has been closed\n");
+    fflush(stdout);
 
     closeTCPSender(sender);
 }

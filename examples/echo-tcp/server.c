@@ -1,5 +1,5 @@
 #include "env.h"
-#include "../netlib/netlib.h"
+#include "../../netlib/netlib.h"
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,19 +42,19 @@ int main(){
         printf("\n[+] Connected %s:%i by %i local socket", inet_ntoa(client->clientInfo.sin_addr), client->clientInfo.sin_port, client->socket);
         fflush(stdout);
 
+        int open = 0;
         do {
             listenTCP(buffer, client);
+            open = buffer->dataSize > 0;
+
             printf("\n%s", (char*)buffer->data);
             fflush(stdout);
 
             stringToBuffer(buffer, "RecievedSuccess");
             replyTCP(buffer, client);
             
-            printf(" %u", buffer->dataSize);
             fflush(stdout);
-            
-            sleep(2);
-        } while(buffer->dataSize > 0);
+        } while(open);
 
         printf("\n[-] Disonnected %s:%i by %i local socket", inet_ntoa(client->clientInfo.sin_addr), client->clientInfo.sin_port, client->socket);
         fflush(stdout);

@@ -67,11 +67,7 @@ TCPClient acceptTCP(TCPListener listener){
 }
 
 void listenTCP(Buffer buffer, TCPClient client){
-    // Read client data
     buffer->dataSize = recv(client->socket, buffer->data, buffer->size, 0);
-
-    // Desconnection(?)
-    if(buffer->dataSize == 0) close(client->socket);
 }
 
 int replyTCP(Buffer buffer, TCPClient client){
