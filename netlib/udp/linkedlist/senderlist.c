@@ -40,7 +40,7 @@ UDPSender insertUDPSender(UDPSenderList* senderList, char* address, unsigned por
         *senderList = newSender;
 
         // Open socket
-        newSender->sender = openUDPSender(address, port, bufferSize);
+        newSender->sender = openUDPSender(address, port);
 
         // If fails
         if(newSender->sender == NULL){
@@ -73,7 +73,7 @@ UDPSender insertUDPSender(UDPSenderList* senderList, char* address, unsigned por
         previous->next = newSender;
 
         // Open socket
-        newSender->sender = openUDPSender(address, port, bufferSize);
+        newSender->sender = openUDPSender(address, port);
 
         // If fails
         if(newSender->sender == NULL){

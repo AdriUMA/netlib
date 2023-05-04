@@ -2,9 +2,9 @@
 #define NETLIB_BUFFER
 
 typedef struct str_buffer {
-    unsigned size;
-    void* data;
-    unsigned dataSize;
+    unsigned size;          // Buffer size
+    void* data;             // Data (bytes)
+    unsigned dataSize;      // Data length (size>=dataSize)
 }* Buffer;
 
 /** @brief Open buffer allocating memory

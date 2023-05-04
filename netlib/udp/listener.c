@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-UDPListener openUDPListener(unsigned port, unsigned bufferSize){
+UDPListener openUDPListener(unsigned port){
     struct sockaddr_in serverAddress;
 
     // Allocate Memory for the listener struct.
@@ -14,22 +14,6 @@ UDPListener openUDPListener(unsigned port, unsigned bufferSize){
 
     // Prepare a socket using IPv4 and UDP
     if ((listener->socketFD = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        free(listener);
-        return NULL;
-    }
-
-    // Allocate Memory for the buffer
-    if((listener->buffer = malloc(sizeof(struct str_buffer))) == NULL) {
-        free(listener);
-        return NULL;
-    }
-
-    // Buffer
-    listener->buffer->size = bufferSize;
-    listener->buffer->dataSize = 0;
-    listener->buffer->data = malloc(sizeof(bufferSize));
-    if (listener->buffer->data == NULL)  {
-        free(listener->buffer);
         free(listener);
         return NULL;
     }
@@ -44,8 +28,6 @@ UDPListener openUDPListener(unsigned port, unsigned bufferSize){
 
     // Socket opening
     if (bind(listener->socketFD, (const struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) {
-        free(listener->buffer->data);
-        free(listener->buffer);
         free(listener);
         return NULL;
     }
@@ -61,17 +43,15 @@ void closeUDPListener(UDPListener listener){
     close(listener->socketFD);
 
     // Free memory
-    free(listener->buffer->data);
-    free(listener->buffer);
     free(listener);
 }
 
-char* listenUDP(UDPListener listener){
+char* listenUDP(Buffer buffer, UDPListener listener){
     struct sockaddr_in client;
     socklen_t len;
 
     // Waiting for new client data
-    listener->buffer->dataSize = recvfrom(listener->socketFD, listener->buffer->data, listener->buffer->size, MSG_WAITALL, (struct sockaddr *restrict) &client, (socklen_t *restrict)&len);
+    buffer->dataSize = recvfrom(listener->socketFD, buffer->data, buffer->dataSize, MSG_WAITALL, (struct sockaddr *restrict) &client, (socklen_t *restrict)&len);
     
     return inet_ntoa(client.sin_addr);
 }
