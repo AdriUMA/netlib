@@ -68,7 +68,7 @@ int main() {
 
 void listenerManager(){
     // Open listener
-    listener = openUDPListener(CLIENT_PORT, SERVER_BUFFER);
+    listener = openUDPListener(CLIENT_PORT);
     Buffer buffer = openBuffer(SERVER_BUFFER);
 
     // Error opening listener socket
@@ -79,7 +79,7 @@ void listenerManager(){
 
     // Listening
     while (1) {
-        listenUDP(listener);
+        listenUDP(buffer, listener);
         if(connection == 0){
             // If connection is not established, we are waiting for server notice
             if (strcmp((const char*)buffer->data, WELCOME_MESSAGE) == 0){
@@ -122,7 +122,7 @@ void senderManager() {
     strcat(buffer, ": ");
 
     // Open sender
-    sender = openUDPSender(serverAddress, SERVER_PORT, SERVER_BUFFER);
+    sender = openUDPSender(serverAddress, SERVER_PORT);
 
     // Error opening sender socket
     if (sender == NULL){

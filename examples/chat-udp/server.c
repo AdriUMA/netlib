@@ -41,7 +41,7 @@ int main () {
     VERSION;
 
     // Open listener
-    listener = openUDPListener(SERVER_PORT, SERVER_BUFFER);
+    listener = openUDPListener(SERVER_PORT);
     if (listener == NULL) {
         perror("Listener error");
         exit(EXIT_FAILURE);
@@ -84,7 +84,7 @@ void run(){
 
     while (1) {
         // Waiting for a new frame
-        strcpy(clientAddress, listenUDP(listener));
+        strcpy(clientAddress, listenUDP(buffer, listener));
         
         //* ----- CASES ----- *//
         // Reading error
