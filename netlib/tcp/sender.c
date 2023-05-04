@@ -3,11 +3,12 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
 struct sockaddr_in server;
 
-TCPSender openTCPSender(char* address, unsigned port, unsigned bufferSize){
+TCPSender openTCPSender(char* address, unsigned port){
     TCPSender sender;
 
     // Allocate memory for the sender
@@ -25,8 +26,8 @@ TCPSender openTCPSender(char* address, unsigned port, unsigned bufferSize){
         free(sender);
         return NULL;
     }
+
     strcpy(sender->address, address);
-    sender->bufferSize = bufferSize;
     sender->port = port;
 
     // Server conf
@@ -56,7 +57,11 @@ void closeTCPSender(TCPSender sender){
     free(sender);
 }
 
-int sendTCP(TCPSender sender, void *data, unsigned int dataLength){
-    // Send
-    return sendto(sender->socketFD, data, dataLength, 0, (const struct sockaddr*)&server, sizeof(server));
+int sendTCPSender(TCPSender sender, Buffer buffer){
+    return sendto(sender->socketFD, buffer->data, buffer->dataSize, 0, (const struct sockaddr*)&server, sizeof(server));
+}
+
+int waitResponse(TCPSender sender, Buffer buffer){
+    buffer->dataSize = recv(sender->socketFD, buffer->data, buffer->size, 0);
+    return buffer->dataSize ;
 }

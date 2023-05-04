@@ -5,6 +5,7 @@
 
 // Generic
 #include "linkedlist/addresslist.h"
+#include "buffer.h"
 
 // UDP-oriented
 #include "udp/listener.h"

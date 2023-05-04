@@ -69,7 +69,8 @@ int main() {
 void listenerManager(){
     // Open listener
     listener = openUDPListener(CLIENT_PORT, SERVER_BUFFER);
-    
+    Buffer buffer = openBuffer(SERVER_BUFFER);
+
     // Error opening listener socket
     if (listener == NULL){
         perror("\nError opening listener");
@@ -81,13 +82,13 @@ void listenerManager(){
         listenUDP(listener);
         if(connection == 0){
             // If connection is not established, we are waiting for server notice
-            if (strcmp((const char*)listener->buffer.data, WELCOME_MESSAGE) == 0){
+            if (strcmp((const char*)buffer->data, WELCOME_MESSAGE) == 0){
                 // If server notice us, we are connected
                 connection = 1;
                 kill(senderPid, SIGUSR1);
             }
         }
-        printf("\n> %s\n", (const char*)listener->buffer.data);
+        printf("\n> %s\n", (const char*)buffer->data);
     }
 
     // Interruption exception

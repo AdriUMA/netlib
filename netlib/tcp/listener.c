@@ -2,29 +2,17 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 
-TCPListener openTCPListener(unsigned port, unsigned bufferSize){
+TCPListener openTCPListener(unsigned port, unsigned maxConnections){
     // Allocate Memory for the listener struct.
     TCPListener listener = malloc(sizeof(struct str_tcplistener));
     if (listener == NULL) return NULL;
 
-    // Init socket list
-    createSocketList(&listener->socketList);
-
     // Prepare a socket using IPv4 and TCP
     if ((listener->socketFD = socket(AF_INET, SOCK_STREAM, 0)) <= 0) {
-        free(listener);
-        return NULL;
-    }
-
-    // Buffer
-    listener->buffer.size = bufferSize;
-    listener->buffer.dataSize = 0;
-    listener->buffer.data = malloc(sizeof(bufferSize));
-    if (listener->buffer.data == NULL)  {
-        close(listener->socketFD);
         free(listener);
         return NULL;
     }
@@ -41,11 +29,17 @@ TCPListener openTCPListener(unsigned port, unsigned bufferSize){
     // Socket opening
     if (bind(listener->socketFD, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) {
         close(listener->socketFD);
-        free(listener->buffer.data);
         free(listener);
         return NULL;
     }
     
+    // If listener is ready, prepare max connections
+    if(listen(listener->socketFD, maxConnections) < 0){
+        close(listener->socketFD);
+        free(listener);
+        return NULL;
+    }
+
     // Returning the listener ready
     return listener;
 }
@@ -57,32 +51,37 @@ void closeTCPListener(TCPListener listener){
     close(listener->socketFD);
 
     // Free memory
-    free(listener->buffer.data);
     free(listener);
 }
 
-char* listenTCP(TCPListener listener){
-    int client_socket = -2;
-    struct sockaddr_in client_addr;
-    socklen_t len = sizeof(client_addr);
+TCPClient acceptTCP(TCPListener listener){
+    TCPClient client = malloc(sizeof(struct str_tcpclient));
+    if (client == NULL) return NULL;
     
-    // Wait and accept connection
-    if(listen(listener->socketFD, 1) == 0) {
-        client_socket = accept(listener->socketFD, (struct sockaddr *) &client_addr, &len);
+    socklen_t size = sizeof(client->clientInfo);
+    
+    // Wait until accept
+    client->socket = accept(listener->socketFD, (struct sockaddr *) &client->clientInfo, &size);
+    
+    return client;
+}
 
-        // If fails, check if is already accepted
-        if(client_socket == -1) {
-            client_socket = getSocket(&listener->socketList, inet_ntoa(client_addr.sin_addr));
-        }else if(client_socket >= 0) {
-            insertSocket(&listener->socketList, client_socket, inet_ntoa(client_addr.sin_addr));
-        }
-    }
-    
+void listenTCP(Buffer buffer, TCPClient client){
     // Read client data
-    if(client_socket >= 0) listener->buffer.dataSize = read(client_socket, listener->buffer.data, listener->buffer.size);
+    buffer->dataSize = recv(client->socket, buffer->data, buffer->size, 0);
 
     // Desconnection(?)
-    if(listener->buffer.dataSize == 0) removeSocket(&listener->socketList, client_socket, inet_ntoa(client_addr.sin_addr));
+    if(buffer->dataSize == 0) close(client->socket);
+}
 
-    return inet_ntoa(client_addr.sin_addr);
+int replyTCP(Buffer buffer, TCPClient client){
+    return send(client->socket, buffer->data, buffer->dataSize, 0);
+}
+
+void closeClient(TCPClient client){
+    // Close client port
+    close(client->socket);
+
+    // Free memory
+    free(client);
 }

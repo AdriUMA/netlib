@@ -18,11 +18,18 @@ UDPListener openUDPListener(unsigned port, unsigned bufferSize){
         return NULL;
     }
 
+    // Allocate Memory for the buffer
+    if((listener->buffer = malloc(sizeof(struct str_buffer))) == NULL) {
+        free(listener);
+        return NULL;
+    }
+
     // Buffer
-    listener->buffer.size = bufferSize;
-    listener->buffer.dataSize = 0;
-    listener->buffer.data = malloc(sizeof(bufferSize));
-    if (listener->buffer.data == NULL)  {
+    listener->buffer->size = bufferSize;
+    listener->buffer->dataSize = 0;
+    listener->buffer->data = malloc(sizeof(bufferSize));
+    if (listener->buffer->data == NULL)  {
+        free(listener->buffer);
         free(listener);
         return NULL;
     }
@@ -37,7 +44,8 @@ UDPListener openUDPListener(unsigned port, unsigned bufferSize){
 
     // Socket opening
     if (bind(listener->socketFD, (const struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) {
-        free(listener->buffer.data);
+        free(listener->buffer->data);
+        free(listener->buffer);
         free(listener);
         return NULL;
     }
@@ -53,7 +61,8 @@ void closeUDPListener(UDPListener listener){
     close(listener->socketFD);
 
     // Free memory
-    free(listener->buffer.data);
+    free(listener->buffer->data);
+    free(listener->buffer);
     free(listener);
 }
 
@@ -62,7 +71,7 @@ char* listenUDP(UDPListener listener){
     socklen_t len;
 
     // Waiting for new client data
-    listener->buffer.dataSize = recvfrom(listener->socketFD, listener->buffer.data, listener->buffer.size, MSG_WAITALL, (struct sockaddr *restrict) &client, (socklen_t *restrict)&len);
+    listener->buffer->dataSize = recvfrom(listener->socketFD, listener->buffer->data, listener->buffer->size, MSG_WAITALL, (struct sockaddr *restrict) &client, (socklen_t *restrict)&len);
     
     return inet_ntoa(client.sin_addr);
 }

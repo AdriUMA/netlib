@@ -1,14 +1,7 @@
 #ifndef NETLIB_UDP_LISTENER_H
 #define NETLIB_UDP_LISTENER_H
 
-#ifndef NETLIB_BUFFER
-#define NETLIB_BUFFER
-typedef struct str_buffer {
-    unsigned size;
-    void* data;
-    unsigned dataSize;
-} Buffer;
-#endif
+#include "../buffer.h"
 
 /*listener struct*/
 typedef struct str_udplistener {

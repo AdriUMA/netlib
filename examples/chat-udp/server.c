@@ -77,6 +77,7 @@ int alredyConnected(char* clientAddress) {
 void run(){
     char* clientAddress = malloc(30);
     UDPSender newClient = NULL;
+    Buffer buffer = openBuffer(SERVER_BUFFER);
 
     // Init list
     createUDPSenderList(&clients);
@@ -87,17 +88,17 @@ void run(){
         
         //* ----- CASES ----- *//
         // Reading error
-        if (listener->buffer.dataSize == -1){
+        if (buffer->dataSize == -1){
             printf("\nUnknown error reading frame\n");
         }
         // New client
-        else if (strcmp((const char*)listener->buffer.data, NOTICE_CONNECT) == 0){
+        else if (strcmp((const char*)buffer->data, NOTICE_CONNECT) == 0){
             newClient = insertUDPSender(&clients, clientAddress, CLIENT_PORT, SERVER_BUFFER);
             sendUDP(newClient, WELCOME_MESSAGE, strlen(WELCOME_MESSAGE)+1);
             printf("\n(+) Client Conected: %s\n", clientAddress);
         }
         // Client log out
-        else if (strcmp((const char*)listener->buffer.data, NOTICE_DISCONNECT) == 0){
+        else if (strcmp((const char*)buffer->data, NOTICE_DISCONNECT) == 0){
             if(alredyConnected(clientAddress) == 0){
                 removeUDPSender(&clients, clientAddress);
                 printf("\n(-) Client Disconected: %s\n", clientAddress);
@@ -107,12 +108,12 @@ void run(){
         else {
             // Accept if address is in the list
             if (alredyConnected(clientAddress) == 0){
-                noticeClients(listener->buffer.data, listener->buffer.dataSize);
-                printf("\nFrame from: %s\n%s\n", clientAddress, (const char*)listener->buffer.data);
+                noticeClients(buffer->data, buffer->dataSize);
+                printf("\nFrame from: %s\n%s\n", clientAddress, (const char*)buffer->data);
             }
             // Refused data
             else{
-                printf("\nREFUSED FROM: %s\nREFUSED DATA: %s\n", clientAddress, (const char*)listener->buffer.data);
+                printf("\nREFUSED FROM: %s\nREFUSED DATA: %s\n", clientAddress, (const char*)buffer->data);
             }
         }
         fflush(stdout);

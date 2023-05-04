@@ -4,12 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/signal.h>
+#include <unistd.h>
 
 TCPSender sender;
+Buffer buffer;
 
 void handler (int signal) {
     if (signal == SIGINT){
         closeTCPSender(sender);
+        closeBuffer(buffer);
         exit(EXIT_SUCCESS);
     }
 }
@@ -17,8 +20,29 @@ void handler (int signal) {
 int main(){
     signal(SIGINT, handler);
 
-    sender = openTCPSender("127.0.0.1", SERVER_PORT, SERVER_BUFFER);
-    if (sender == NULL) exit(EXIT_FAILURE);
+    int tries = 0;
+    float waitForRetry = 0;
+
+    while (sender == NULL && tries < 3) {
+        sleep(waitForRetry);
+
+        printf("\nConnecting to the server...");
+        fflush(stdout);
+
+        sender = openTCPSender("127.0.0.1", SERVER_PORT);
+        tries++;
+
+        waitForRetry = 1;
+    }
+
+    buffer = openBuffer(SERVER_BUFFER);
+    if (sender == NULL || buffer == NULL) {
+        printf("\nCould not connect\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    printf("\nConnected\n");
+    fflush(stdout);
 
     char user[30] = "ATM";
     char str[SERVER_BUFFER - (2 + strlen(user))];
@@ -31,9 +55,16 @@ int main(){
         strcat(data, ": ");
         strcat(data, str);
 
-        sendTCP(sender, data, strlen(data)+1);
+        stringToBuffer(buffer, data);
 
-        printf("send");
+        sendTCPSender(sender, buffer);
+
+        printf("Sent, waiting response from server...");
+        fflush(stdout);
+
+        waitResponse(sender, buffer);
+        printf("\n[*] SERVER: %s\n", (char*)buffer->data);
+        fflush(stdout);
     }
 
     closeTCPSender(sender);
