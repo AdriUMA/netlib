@@ -18,7 +18,9 @@ void signalHandler(int signal){
             UDPSenderList aux = clients;
 
             while (aux != NULL) {
-                sendUDP(aux->sender, TERMINATED_MESSAGE, strlen(TERMINATED_MESSAGE)+1);
+                Buffer buf = openBuffer(SERVER_BUFFER);
+                stringIntoBuffer(buf, TERMINATED_MESSAGE);
+                sendUDP(buf, aux->sender);
                 aux = aux->next;
             }
 
@@ -55,10 +57,12 @@ int main () {
 
 void noticeClients(void* data, unsigned dataLength){
     UDPSenderList senders = clients;
-
+    Buffer buffer = openBuffer(dataLength);
+    buffer->data = data;
+    buffer->dataSize = dataLength;
     // Iterates all clients and notice them
     while (senders != NULL) {
-        sendUDP(senders->sender, data, dataLength);
+        sendUDP(buffer, senders->sender);
         senders = senders->next;
     }
 }
@@ -81,7 +85,7 @@ void run(){
 
     // Init list
     createUDPSenderList(&clients);
-
+    Buffer buf = openBuffer(SERVER_BUFFER);
     while (1) {
         // Waiting for a new frame
         strcpy(clientAddress, listenUDP(buffer, listener));
@@ -94,7 +98,8 @@ void run(){
         // New client
         else if (strcmp((const char*)buffer->data, NOTICE_CONNECT) == 0){
             newClient = insertUDPSender(&clients, clientAddress, CLIENT_PORT, SERVER_BUFFER);
-            sendUDP(newClient, WELCOME_MESSAGE, strlen(WELCOME_MESSAGE)+1);
+            stringIntoBuffer(buf, WELCOME_MESSAGE);
+            sendUDP(buf, newClient);
             printf("\n(+) Client Conected: %s\n", clientAddress);
         }
         // Client log out

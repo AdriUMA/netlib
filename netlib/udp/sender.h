@@ -2,6 +2,7 @@
 #define NETLIB_UDP_SENDER_H
 
 #include <netinet/in.h>
+#include "../buffer.h"
 
 typedef struct str_udpsender {
     char* address;
@@ -27,6 +28,6 @@ void closeUDPSender(UDPSender sender);
  *  @param dataLength Number of bytes
  *  @return Returns the number sent, or -1 for errors.
  */
-int sendUDP(UDPSender sender, void* data, unsigned dataLength);
+int sendUDP(Buffer buffer, UDPSender sender);
 
 #endif

@@ -19,9 +19,16 @@ Buffer openBuffer(unsigned size);
 void closeBuffer(Buffer buffer);
 
 /** @brief Prepare a buffer with string fill 
- *  @param string
  *  @param buffer Open buffer to be filled
+ *  @param bytes
+ *  @param length
  */
-void stringToBuffer(Buffer buffer, char* string);
+void bytesIntoBuffer(Buffer buffer, void* bytes, unsigned length);
+
+/** @brief Prepare a buffer with string fill 
+ *  @param buffer Open buffer to be filled
+ *  @param string
+ */
+void stringIntoBuffer(Buffer buffer, char* string);
 
 #endif

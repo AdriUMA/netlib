@@ -28,8 +28,10 @@ void signalHandler(int signal){
             wait(NULL);
 
             if (sender != NULL){
+                Buffer buf = openBuffer(SERVER_BUFFER);
+                stringIntoBuffer(buf, NOTICE_DISCONNECT);
                 // If sender is available, send to server our disconnection
-                sendUDP(sender, NOTICE_DISCONNECT, strlen(NOTICE_DISCONNECT)+1);
+                sendUDP(buf, sender);
                 closeUDPSender(sender);
             }
 
@@ -136,8 +138,10 @@ void senderManager() {
     signal(SIGUSR1, signalHandler);
 
     int sleepTime = 5;
+    Buffer buf = openBuffer(SERVER_BUFFER);
     while(connection == 0 && sleepTime != 0){
-        sendUDP(sender, NOTICE_CONNECT, strlen(NOTICE_CONNECT)+1);
+        stringIntoBuffer(buf, NOTICE_CONNECT);
+        sendUDP(buf, sender);
         sleepTime--;
         sleep(1);
     }
@@ -149,7 +153,8 @@ void senderManager() {
     // Read and send loop
     while (connection) {
         scanf("\n%[^\n]", &buffer[bufferInitialPosition]);
-        sendUDP(sender, (void*)buffer, strlen(buffer)+1);
+        stringIntoBuffer(buf, buffer);
+        sendUDP(buf, sender);
     }
 
     // Interruption exception

@@ -55,7 +55,7 @@ int main(){
         strcat(data, ": ");
         strcat(data, str);
 
-        stringToBuffer(buffer, data);
+        stringIntoBuffer(buffer, data);
 
         sendTCPSender(sender, buffer);
 

@@ -45,6 +45,6 @@ void closeUDPSender(UDPSender sender){
     free(sender);
 }
 
-int sendUDP(UDPSender sender, void *data, unsigned int dataLength){
-    return sendto(sender->socketFD, data, dataLength, 0, (const struct sockaddr*)&sender->host, sizeof(sender->host));
+int sendUDP(Buffer buffer, UDPSender sender){
+    return sendto(sender->socketFD, buffer->data, buffer->dataSize, 0, (const struct sockaddr*)&sender->host, sizeof(sender->host));
 }

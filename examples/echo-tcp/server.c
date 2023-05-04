@@ -50,7 +50,7 @@ int main(){
             printf("\n%s", (char*)buffer->data);
             fflush(stdout);
 
-            stringToBuffer(buffer, "RecievedSuccess");
+            stringIntoBuffer(buffer, "RecievedSuccess");
             replyTCP(buffer, client);
             
             fflush(stdout);

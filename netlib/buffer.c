@@ -16,7 +16,16 @@ void closeBuffer(Buffer buffer) {
     free(buffer);
 }
 
-void stringToBuffer(Buffer buffer, char* string){
+void bytesIntoBuffer(Buffer buffer, void* bytes, unsigned length){
+    char* ptrData = buffer->data;
+    char* ptrBytes = bytes;
+
+    for (int i = 0; i < length; i++)
+        *(ptrData+1) = *(ptrBytes+1);    
+}
+
+
+void stringIntoBuffer(Buffer buffer, char* string){
     strcpy(buffer->data, string);
     buffer->dataSize = strlen(string)+1;
 }
