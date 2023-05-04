@@ -137,10 +137,11 @@ void senderManager() {
 
     signal(SIGUSR1, signalHandler);
 
-    int sleepTime = 5;
     Buffer buf = openBuffer(SERVER_BUFFER);
+    stringIntoBuffer(buf, NOTICE_CONNECT);
+
+    int sleepTime = 5;
     while(connection == 0 && sleepTime != 0){
-        stringIntoBuffer(buf, NOTICE_CONNECT);
         sendUDP(buf, sender);
         sleepTime--;
         sleep(1);

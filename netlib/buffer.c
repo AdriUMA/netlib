@@ -26,6 +26,6 @@ void bytesIntoBuffer(Buffer buffer, void* bytes, unsigned length){
 
 
 void stringIntoBuffer(Buffer buffer, char* string){
-    strcpy(buffer->data, string);
+    strcpy((char*)buffer->data, string);
     buffer->dataSize = strlen(string)+1;
 }

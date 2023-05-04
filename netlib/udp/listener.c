@@ -51,7 +51,7 @@ char* listenUDP(Buffer buffer, UDPListener listener){
     socklen_t len;
 
     // Waiting for new client data
-    buffer->dataSize = recvfrom(listener->socketFD, buffer->data, buffer->dataSize, MSG_WAITALL, (struct sockaddr *restrict) &client, (socklen_t *restrict)&len);
+    buffer->dataSize = recvfrom(listener->socketFD, buffer->data, buffer->size, MSG_WAITALL, (struct sockaddr *restrict) &client, (socklen_t *restrict)&len);
     
     return inet_ntoa(client.sin_addr);
 }

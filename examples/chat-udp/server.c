@@ -86,9 +86,11 @@ void run(){
     // Init list
     createUDPSenderList(&clients);
     Buffer buf = openBuffer(SERVER_BUFFER);
+
     while (1) {
         // Waiting for a new frame
         strcpy(clientAddress, listenUDP(buffer, listener));
+        printf("%s", (const char*)buffer->data);
         
         //* ----- CASES ----- *//
         // Reading error
