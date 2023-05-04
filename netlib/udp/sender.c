@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-UDPSender openUDPSender(char* address, unsigned port, unsigned bufferSize){
+UDPSender openUDPSender(char* address, unsigned port){
     UDPSender sender;
 
     // Allocate memory for the sender
@@ -24,8 +24,12 @@ UDPSender openUDPSender(char* address, unsigned port, unsigned bufferSize){
         return NULL;
     }
     strcpy(sender->address, address);
-    sender->bufferSize = bufferSize;
     sender->port = port;
+
+    // host
+    sender->host.sin_family = AF_INET;
+    sender->host.sin_port = htons(sender->port);
+    sender->host.sin_addr.s_addr = inet_addr(sender->address);
 
     return sender;
 }
@@ -42,13 +46,5 @@ void closeUDPSender(UDPSender sender){
 }
 
 int sendUDP(UDPSender sender, void *data, unsigned int dataLength){
-    struct sockaddr_in server;
-
-    // Server
-    server.sin_family = AF_INET;
-    server.sin_port = htons(sender->port);
-    server.sin_addr.s_addr = inet_addr(sender->address);
-
-    // Send
-    return sendto(sender->socketFD, data, dataLength, 0, (const struct sockaddr*)&server, sizeof(server));
+    return sendto(sender->socketFD, data, dataLength, 0, (const struct sockaddr*)&sender->host, sizeof(sender->host));
 }

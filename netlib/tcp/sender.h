@@ -2,11 +2,13 @@
 #define NETLIB_TCP_SENDER_H
 
 #include "../buffer.h"
+#include <netinet/in.h>
 
 typedef struct str_tcpsender {
     char* address;
     unsigned port;
     int socketFD;
+    struct sockaddr_in host;
 }* TCPSender;
 
 /** @brief Allocate in memory and open sender socket

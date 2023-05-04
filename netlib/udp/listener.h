@@ -7,15 +7,13 @@
 typedef struct str_udplistener {
     unsigned port;
     int socketFD;
-    Buffer buffer;
 }* UDPListener;
 
 /** @brief Allocate in memory and open listener socket
  *  @param port
- *  @param bufferSize
  *  @return Pointer to struct in memory or NULL if socket or memory are busy 
  */
-UDPListener openUDPListener(unsigned port, unsigned bufferSize);
+UDPListener openUDPListener(unsigned port);
 
 /** @brief Close socket and free memory
  *  @param listener
@@ -23,9 +21,10 @@ UDPListener openUDPListener(unsigned port, unsigned bufferSize);
 void closeUDPListener(UDPListener listener);
 
 /** @brief Sleep waiting for a frame
+ *  @param buffer
  *  @param listener
  *  @return Source address
  */
-char* listenUDP(UDPListener listener);
+char* listenUDP(Buffer buffer, UDPListener listener);
 
 #endif

@@ -6,8 +6,6 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-struct sockaddr_in server;
-
 TCPSender openTCPSender(char* address, unsigned port){
     TCPSender sender;
 
@@ -30,13 +28,13 @@ TCPSender openTCPSender(char* address, unsigned port){
     strcpy(sender->address, address);
     sender->port = port;
 
-    // Server conf
-    server.sin_family = AF_INET;
-    server.sin_port = htons(sender->port);
-    server.sin_addr.s_addr = inet_addr(sender->address);
+    // host conf
+    sender->host.sin_family = AF_INET;
+    sender->host.sin_port = htons(sender->port);
+    sender->host.sin_addr.s_addr = inet_addr(sender->address);
 
     // Establish connection
-    if (connect(sender->socketFD, (struct sockaddr *)&server, sizeof(server)) < 0) {
+    if (connect(sender->socketFD, (struct sockaddr *)&sender->host, sizeof(sender->host)) < 0) {
         close(sender->socketFD);
         free(sender->address);
         free(sender);
@@ -58,7 +56,7 @@ void closeTCPSender(TCPSender sender){
 }
 
 int sendTCPSender(TCPSender sender, Buffer buffer){
-    return sendto(sender->socketFD, buffer->data, buffer->dataSize, 0, (const struct sockaddr*)&server, sizeof(server));
+    return sendto(sender->socketFD, buffer->data, buffer->dataSize, 0, (const struct sockaddr*)&sender->host, sizeof(sender->host));
 }
 
 int waitResponse(TCPSender sender, Buffer buffer){
