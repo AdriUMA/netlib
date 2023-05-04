@@ -29,7 +29,7 @@ void closeTCPSender(TCPSender sender);
  *  @param dataLength Number of bytes
  *  @return Returns the number of bytes sent, or -1 for errors
  */
-int sendTCPSender(TCPSender sender, Buffer buffer);
+int sendTCP(TCPSender sender, Buffer buffer);
 
 /** @brief Wait for server response
  *  @param sender

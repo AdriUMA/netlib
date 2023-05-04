@@ -55,7 +55,7 @@ void closeTCPSender(TCPSender sender){
     free(sender);
 }
 
-int sendTCPSender(TCPSender sender, Buffer buffer){
+int sendTCP(TCPSender sender, Buffer buffer){
     return sendto(sender->socketFD, buffer->data, buffer->dataSize, 0, (const struct sockaddr*)&sender->host, sizeof(sender->host));
 }
 

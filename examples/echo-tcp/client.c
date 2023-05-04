@@ -57,7 +57,7 @@ int main(){
 
         stringIntoBuffer(buffer, data);
 
-        sendTCPSender(sender, buffer);
+        sendTCP(sender, buffer);
 
         printf("Sent, waiting response from server...");
         fflush(stdout);
